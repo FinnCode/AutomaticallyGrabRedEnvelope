@@ -2,11 +2,11 @@ package la.iok.finnecho.auto.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import la.iok.finnecho.auto.R;
 import la.iok.finnecho.auto.device.Simulation;
-import la.iok.finnecho.auto.service.BaseService;
-import la.iok.finnecho.auto.service.MainService;
+import la.iok.finnecho.auto.service.HookService;
 
 public class MainActivity extends BaseActivity {
     @Override
@@ -19,9 +19,8 @@ public class MainActivity extends BaseActivity {
 
     //启动服务
     private void startServices() {
-        Intent mainService = new Intent(MainActivity.this, MainService.class);
+        Intent mainService = new Intent(getApplicationContext(), HookService.class);
         startService(mainService);
-        bindService(mainService, BaseService.getServiceConnection(), BIND_AUTO_CREATE);
     }
 
     //获取相关权限
@@ -29,10 +28,10 @@ public class MainActivity extends BaseActivity {
         //root权限
         Simulation.getRoot();
 
-//        //监听通知栏权限
-//        if (!isOpenNotificationReadPermission()) {
-//            Toast.makeText(getApplicationContext(), "请允许本软件监听通知信息", Toast.LENGTH_LONG);
-//            openNotificationReadPermission();
-//        }
+        //监听辅助功能权限
+        if (!isAccessibilitySettingsOn()) {
+            Toast.makeText(getApplicationContext(), "请允许本软件的辅助功能", Toast.LENGTH_LONG).show();
+            openAccessbilitySettings();
+        }
     }
 }

@@ -1,18 +1,17 @@
 package la.iok.finnecho.auto.service;
 
 import android.accessibilityservice.AccessibilityService;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.Toast;
 
 /**
  * Created by Finn on 2016/9/18 0018.
  */
-public class MainService extends AccessibilityService {
+@SuppressLint("NewApi")
+public class HookService extends AccessibilityService {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -28,11 +27,16 @@ public class MainService extends AccessibilityService {
                 break;
             //省略其他的一堆可以监听的事件
         }
-        Toast.makeText(MainService.this, event.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(HookService.this, event.toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onInterrupt() {
-        Toast.makeText(MainService.this, "onInterrupt", Toast.LENGTH_SHORT).show();
+        Toast.makeText(HookService.this, "onInterrupt", Toast.LENGTH_SHORT).show();
     }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, START_FLAG_REDELIVERY, startId);
+    }
+
 }

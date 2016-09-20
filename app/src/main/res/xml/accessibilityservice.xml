@@ -1,8 +1,8 @@
-<span style="font-family:Times New Roman;font-size:14px;"><?xml version="1.0" encoding="utf-8"?>
-    <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-        android:accessibilityEventTypes="typeAllMask"
-        android:accessibilityFeedbackType="feedbackGeneric"
-        android:accessibilityFlags="flagDefault"
-        android:canRetrieveWindowContent="true"
-        android:description="@string/app_name"
-        android:settingsActivity="com.example.xxx.android.accessibility.ServiceSettingsActivity" /></span>
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeNotificationStateChanged|typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags=""
+    android:canRetrieveWindowContent="true"
+    android:description="@string/app_name"
+    android:notificationTimeout="100" />
