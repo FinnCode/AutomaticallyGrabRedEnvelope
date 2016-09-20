@@ -49,6 +49,9 @@ public class HookService extends AccessibilityService {
         }
     }
 
+    int hasDetected = 0;
+    int hasGrabed = 0;
+
     private void handlerWindowChanged(AccessibilityEvent event) {
         if (event.getPackageName().equals("com.tencent.mm")) {
             //这是聊天界面
@@ -58,10 +61,13 @@ public class HookService extends AccessibilityService {
                 Collections.reverse(nodeInfos);
                 for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
                     if (nodeInfo.getClassName().equals("android.widget.TextView")) {
-                        Rect rect = new Rect();
-                        nodeInfo.getParent().getBoundsInScreen(rect);
-                        Simulation.sendScreenClick((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
-                        break;
+                        if (hasGrabed < hasDetected) {
+                            hasGrabed++;
+                            Rect rect = new Rect();
+                            nodeInfo.getParent().getBoundsInScreen(rect);
+                            Simulation.sendScreenClick((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+                            break;
+                        }
                     }
                 }
             }
@@ -84,6 +90,7 @@ public class HookService extends AccessibilityService {
                 Toast.makeText(this, event.getBeforeText(), Toast.LENGTH_SHORT).show();
                 Notification notifucation = (Notification) event.getParcelableData();
                 if (notifucation.tickerText.toString().contains("[微信红包]")) {
+                    hasDetected++;
                     (notifucation).contentIntent.send();
                 }
             }
