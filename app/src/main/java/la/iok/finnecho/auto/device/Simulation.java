@@ -20,6 +20,7 @@ public class Simulation {
             process = Runtime.getRuntime().exec("su\n");
             os = new DataOutputStream(process.getOutputStream());
             os.flush();
+            is = new DataInputStream(process.getInputStream());
         } catch (Exception e) {
             Log.e("Finn", "the device is not rooted,  error message： " + e.getMessage(), e);
             return false;
