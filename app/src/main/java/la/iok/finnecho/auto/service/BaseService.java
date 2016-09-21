@@ -31,8 +31,8 @@ public class BaseService extends Service {
         }
     };
 
-    public static Service getService(Class clazz) {
-        return services.get(clazz);
+    public static <T extends Service> T getService(Class<T> clazz) {
+        return (T) services.get(clazz);
     }
 
     public static ServiceConnection getServiceConnection() {
@@ -43,6 +43,12 @@ public class BaseService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return new ServiceBinder(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        services.put(this.getClass(), this);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     protected static class ServiceBinder extends android.os.Binder {

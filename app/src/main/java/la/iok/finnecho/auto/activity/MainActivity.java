@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import la.iok.finnecho.auto.R;
 import la.iok.finnecho.auto.device.Simulation;
+import la.iok.finnecho.auto.handler.WeChatHandler;
 import la.iok.finnecho.auto.service.HookService;
 
 public class MainActivity extends BaseActivity {
@@ -19,8 +20,10 @@ public class MainActivity extends BaseActivity {
 
     //启动服务
     private void startServices() {
-        Intent mainService = new Intent(getApplicationContext(), HookService.class);
+        Intent mainService = new Intent(this, HookService.class);
         startService(mainService);
+        Intent weChatHandler = new Intent(this, WeChatHandler.class);
+        startService(weChatHandler);
     }
 
     //获取相关权限

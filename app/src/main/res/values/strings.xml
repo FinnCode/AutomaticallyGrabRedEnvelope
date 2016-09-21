@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">抢红包</string>
+    <string name="accessServicedDescription">启动这个服务之后，抢红包程序才有权限抢红包哟</string>
+    <string name="accessServiceLabel">抢红包服务</string>
 </resources>
