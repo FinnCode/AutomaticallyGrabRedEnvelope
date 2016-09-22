@@ -9,18 +9,19 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import la.iok.finnecho.auto.executor.PoolExecutor;
 import la.iok.finnecho.auto.handler.EventHandler;
+import la.iok.finnecho.auto.utils.CorventUtils;
 
 /**
  * Created by Finn on 2016/9/18 0018.
  */
 @SuppressLint("NewApi")
 public class HookService extends AccessibilityService {
-
-    private Executor executor = new ScheduledThreadPoolExecutor(2);
 
     private Collection<EventHandler> listener = Collections.synchronizedCollection(new ArrayList<EventHandler>());
 
@@ -48,23 +49,13 @@ public class HookService extends AccessibilityService {
 
     private void notifyWindowChanged(final AccessibilityEvent event) {
         for (final EventHandler handler : listener) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    handler.onWindowChanged(event);
-                }
-            });
+            PoolExecutor.execute(new NotifyWindowChangedRunable(handler, CorventUtils.PO2Map(event)));
         }
     }
 
     private void notifyNotification(final AccessibilityEvent event) {
         for (final EventHandler handler : listener) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    handler.onNotification(event);
-                }
-            });
+            PoolExecutor.execute(new NotifyNotificationRunable(handler, CorventUtils.PO2Map(event)));
         }
     }
 
@@ -81,5 +72,37 @@ public class HookService extends AccessibilityService {
 
     public void addListener(EventHandler eventHandler) {
         this.listener.add(eventHandler);
+    }
+
+    private static abstract class EventNotifyRunnable implements Runnable {
+        protected final Map event;
+        protected final EventHandler handler;
+
+        public EventNotifyRunnable(EventHandler handler, Map event) {
+            this.handler = handler;
+            this.event = event;
+        }
+    }
+
+    private static class NotifyWindowChangedRunable extends EventNotifyRunnable {
+        public NotifyWindowChangedRunable(EventHandler handler, Map<String, Object> event) {
+            super(handler, event);
+        }
+
+        @Override
+        public void run() {
+            handler.onWindowChanged(event);
+        }
+    }
+
+    private class NotifyNotificationRunable extends EventNotifyRunnable {
+
+        public NotifyNotificationRunable(EventHandler handler, Map<String, Object> event) {
+            super(handler, event);
+        }
+        @Override
+        public void run() {
+            handler.onNotification(event);
+        }
     }
 }

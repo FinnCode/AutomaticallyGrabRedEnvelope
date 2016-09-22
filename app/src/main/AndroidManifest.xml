@@ -34,7 +34,7 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibilityservice" />
         </service>
-        <service android:name=".handler.WeChatHandler"></service>
+        <service android:name=".service.MainService"></service>
     </application>
 
 </manifest>
