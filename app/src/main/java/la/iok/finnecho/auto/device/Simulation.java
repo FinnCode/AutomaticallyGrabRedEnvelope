@@ -10,13 +10,17 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import la.iok.finnecho.auto.device.catcher.EventCatcher;
 import la.iok.finnecho.auto.device.event.DeviceEvent;
+import la.iok.finnecho.auto.device.event.DeviceEvents;
 import la.iok.finnecho.auto.device.listener.UnlockListener;
 import la.iok.finnecho.auto.executor.PoolExecutor;
 import la.iok.finnecho.auto.host.App;
@@ -30,15 +34,15 @@ import la.iok.finnecho.auto.service.MainService;
 public class Simulation {
     private static boolean isRoot = false;
     private static Process process = null;
-    private static DataOutputStream os = null;
-    private static DataInputStream is = null;
+    private static BufferedOutputStream os = null;
+    private static BufferedInputStream is = null;
 
     public static boolean getRoot() {
         try {
             process = Runtime.getRuntime().exec("su\n");
-            os = new DataOutputStream(process.getOutputStream());
+            os = new BufferedOutputStream(process.getOutputStream());
             os.flush();
-            is = new DataInputStream(process.getInputStream());
+            is = new BufferedInputStream(process.getInputStream());
         } catch (Exception e) {
             Log.e(App.TAG, "ROOT权限获取失败, 错误信息： " + e.getMessage(), e);
             return false;
@@ -79,8 +83,6 @@ public class Simulation {
 
         try {
             os.write("chmod 777 /dev/input/event1\n".getBytes());
-            os.write("sendevent /dev/input/event1 0 4 144\n".getBytes());
-            os.write("sendevent /dev/input/event1 0 5 2\n".getBytes());
             os.write("sendevent /dev/input/event1 0 4 84165\n".getBytes());
             os.write("sendevent /dev/input/event1 0 5 426793538\n".getBytes());
             os.write("sendevent /dev/input/event1 3 57 13228\n".getBytes());
@@ -134,7 +136,7 @@ public class Simulation {
             public void onUnlock() {
                 BaseService.getService(MainService.class).removeListener(this);
                 eventCatcher.stopCatche();
-                userUnlockEventList.addAll(eventCatcher.getEvents());
+                userUnlockEventList.addAll(DeviceEvents.compactSlide(DeviceEvents.filter(eventCatcher.getEvents(), DeviceEvents.EVENT1, DeviceEvents.EVENT3), 10));
                 sendEvent(userUnlockEventList);
             }
         });
@@ -142,19 +144,20 @@ public class Simulation {
 
     public static void sendEvent(List<DeviceEvent> userUnlockEventList) {
         try {
-            long startTime = System.currentTimeMillis();
+            long totleSleep = 0;
+            StringBuffer chmods = new StringBuffer();
+            StringBuffer shells = new StringBuffer();
             for (DeviceEvent deviceEvent : userUnlockEventList) {
-                long sleepTime = deviceEvent.getTimeout() - System.currentTimeMillis() + startTime;
-                if (sleepTime > 0)
-                Thread.sleep(sleepTime);
-                if (!deviceEvent.isChmod()){
-                    os.write(deviceEvent.getChmodShell().getBytes());
+                shells.append("sleep " + (double) (deviceEvent.getTimeout() - totleSleep) / 1000 + "\n");
+                totleSleep += deviceEvent.getTimeout();
+                if (!deviceEvent.isChmod()) {
+                    chmods.append(deviceEvent.getChmodShell() + "\n");
                     deviceEvent.setChmod();
                 }
-                os.write(("sendevent " + deviceEvent.getShell()).getBytes());
+                shells.append("sendevent " + deviceEvent.getShell() + "\n");
             }
-        } catch (InterruptedException e) {
-            Log.e(App.TAG, e.getMessage(), e);
+            os.write(chmods.toString().getBytes());
+            os.write(shells.toString().getBytes());
         } catch (IOException e) {
             Log.e(App.TAG, e.getMessage(), e);
         }

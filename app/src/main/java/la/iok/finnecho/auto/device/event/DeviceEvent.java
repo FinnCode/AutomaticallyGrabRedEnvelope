@@ -19,16 +19,32 @@ public class DeviceEvent {
         eventPath = split[0].replace(":", "");
         param = new long[split.length - 1];
         for (int i = 0; i < split.length - 1; i++) {
-            param[i] = Long.parseLong(split[i + 1], 16);
+            String value = split[i + 1];
+            if (!value.equals("ffffffff")) {
+                param[i] = Long.parseLong(value, 16);
+            } else {
+                param[i] = -1;
+            }
         }
         this.timeout = timeout;
     }
 
-    public boolean isChmod(){
-       return chmod.contains(eventPath);
+    public DeviceEvent(String event, long... param) {
+        this.eventPath = event;
+        this.param = param;
     }
 
-    public String getChmodShell(){
+    public DeviceEvent(long timeout, String eventPath, long[] param) {
+        this.timeout = timeout;
+        this.eventPath = eventPath;
+        this.param = param;
+    }
+
+    public boolean isChmod() {
+        return chmod.contains(eventPath);
+    }
+
+    public String getChmodShell() {
         return "chmod 777 " + eventPath;
     }
 
@@ -55,6 +71,7 @@ public class DeviceEvent {
     public long[] getParam() {
         return param;
     }
+
     public long getTimeout() {
         return timeout;
     }
@@ -65,5 +82,21 @@ public class DeviceEvent {
 
     public void setChmod() {
         chmod.add(eventPath);
+    }
+
+    @Override
+    public String toString() {
+        return getShell();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DeviceEvent)) {
+            return false;
+        }
+        if (!getShell().equals(((DeviceEvent) obj).getShell())) {
+            return false;
+        }
+        return true;
     }
 }
