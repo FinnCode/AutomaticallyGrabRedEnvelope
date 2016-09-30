@@ -41,7 +41,7 @@ public class WeChatHandler extends EventHandler {
                                 hasGrabed++;
                                 Rect rect = new Rect();
                                 nodeInfo.getParent().getBoundsInScreen(rect);
-                                Simulation.sendScreenClick((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+                                Simulation.sendScreenClickWithRandom((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2, 10000, 20);
                                 break;
                             }
                         }
@@ -53,7 +53,7 @@ public class WeChatHandler extends EventHandler {
                     AccessibilityNodeInfo nodeInfo = rootNodeInfo.getChild(3);
                     Rect rect = new Rect();
                     nodeInfo.getBoundsInScreen(rect);
-                    Simulation.sendScreenClick((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+                    Simulation.sendScreenClickWithRandom((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2, 10000, 20);
                     Toast.makeText(service, "果断抢" + (rect.left + rect.right) / 2 + "," + (rect.top + rect.bottom) / 2, Toast.LENGTH_LONG).show();
                 }
                 //这是红包领取后的界面
@@ -85,7 +85,7 @@ public class WeChatHandler extends EventHandler {
                     Notification notifucation = (Notification) event.get("parcelableData");
                     if (notifucation.tickerText.toString().contains("[微信红包]")) {
                         //判断屏幕是否打开
-                        if(!Simulation.isScreenOn() && Setting.autoUnlock) {
+                        if (!Simulation.isScreenOn() && Setting.autoUnlock) {
                             Simulation.sendEvent(Host.userUnlockEventList);
                         }
 

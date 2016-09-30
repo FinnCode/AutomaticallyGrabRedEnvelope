@@ -2,8 +2,10 @@ package la.iok.finnecho.auto.device.event;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,8 +55,11 @@ public class DeviceEvents {
      */
     public static List<DeviceEvent> compactSlide(List<DeviceEvent> deviceEvents, int level) {
         List<DeviceEvent> result = new ArrayList<>();
+        Map<Integer, DeviceEventGroup> groups = new HashMap<>();
 
-        List<DeviceEventGroup> groups = new ArrayList<>();
+        for (DeviceEvent deviceEvent : deviceEvents) {
+
+        }
 
         return result;
     }

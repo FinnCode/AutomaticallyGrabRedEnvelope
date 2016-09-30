@@ -76,7 +76,15 @@ public class Simulation {
         }
     }
 
-    public static boolean sendScreenClick(int x, int y) {
+    public static boolean sendScreenClickWithRandom(int x, int y, int intensity, int level) {
+        x = (int) (x + Math.round(Math.random() * 2 * level - level));
+        y = (int) (y + Math.round(Math.random() * 2 * level - level));
+        intensity = (int) (intensity + Math.round(Math.random() * 2 * level - level));
+        return sendScreenClick(x, y, intensity);
+    }
+
+
+    public static boolean sendScreenClick(int x, int y, int intensity) {
         if (!isRoot) {
             isRoot = getRoot();
         }
@@ -85,7 +93,7 @@ public class Simulation {
             os.write("chmod 777 /dev/input/event1\n".getBytes());
             os.write("sendevent /dev/input/event1 0 4 84165\n".getBytes());
             os.write("sendevent /dev/input/event1 0 5 426793538\n".getBytes());
-            os.write("sendevent /dev/input/event1 3 57 13228\n".getBytes());
+            os.write(("sendevent /dev/input/event1 3 57 " + intensity + "\n").getBytes());
             os.write(("sendevent /dev/input/event1 3 53 " + x + "\n").getBytes());
             os.write(("sendevent /dev/input/event1 3 54 " + y + "\n").getBytes());
             os.write("sendevent /dev/input/event1 0 0 0\n".getBytes());
