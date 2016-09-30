@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import la.iok.finnecho.auto.executor.PoolExecutor;
 import la.iok.finnecho.auto.handler.EventHandler;
@@ -23,6 +21,9 @@ import la.iok.finnecho.auto.utils.CorventUtils;
 @SuppressLint("NewApi")
 public class HookService extends AccessibilityService {
 
+    /**
+     * 钩子事件监听器
+     */
     private Collection<EventHandler> listener = Collections.synchronizedCollection(new ArrayList<EventHandler>());
 
     @Override
@@ -47,15 +48,23 @@ public class HookService extends AccessibilityService {
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     private void notifyWindowChanged(final AccessibilityEvent event) {
         for (final EventHandler handler : listener) {
-            PoolExecutor.execute(new NotifyWindowChangedRunable(handler, CorventUtils.PO2Map(event)));
+            PoolExecutor.execute(new NotifyWindowChangedRunable(handler, CorventUtils.corventToMap(event)));
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     private void notifyNotification(final AccessibilityEvent event) {
         for (final EventHandler handler : listener) {
-            PoolExecutor.execute(new NotifyNotificationRunable(handler, CorventUtils.PO2Map(event)));
+            PoolExecutor.execute(new NotifyNotificationRunable(handler, CorventUtils.corventToMap(event)));
         }
     }
 

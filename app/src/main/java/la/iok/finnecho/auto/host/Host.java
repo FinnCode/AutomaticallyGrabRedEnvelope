@@ -6,6 +6,7 @@ import java.util.List;
 import la.iok.finnecho.auto.device.event.DeviceEvent;
 
 /**
+ * 保存用户的一些信息
  * Created by Finn on 2016/9/18 0018.
  */
 public class Host {

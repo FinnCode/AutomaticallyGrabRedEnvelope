@@ -1,21 +1,14 @@
 package la.iok.finnecho.auto.device;
 
-import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import la.iok.finnecho.auto.device.catcher.EventCatcher;
@@ -37,6 +30,11 @@ public class Simulation {
     private static BufferedOutputStream os = null;
     private static BufferedInputStream is = null;
 
+    /**
+     * 获取ROOT权限
+     * 模拟驱动必须先获取ROOT权限，否则请用AccessibilityService的方式
+     * @return 是否成功
+     */
     public static boolean getRoot() {
         try {
             process = Runtime.getRuntime().exec("su\n");
@@ -59,6 +57,9 @@ public class Simulation {
         }, delay);
     }
 
+    /**
+     * 发送电源键点击事件，通过模拟驱动事件的方式，几乎等同于用户直接按电源键
+     */
     public static void sendPowerButtonClick() {
         if (!isRoot) {
             isRoot = getRoot();
@@ -76,6 +77,15 @@ public class Simulation {
         }
     }
 
+    /**
+     * 发送屏幕点击事件，通过模拟驱动事件的方式，几乎等同于用户直接点击屏幕
+     * 带有一定随机性的屏幕点击事件，可以通过外挂检测，对坐标轴和压力进行随机化，没有随机延时
+     * @param x 屏幕的x轴坐标
+     * @param y 屏幕的y轴坐标
+     * @param intensity 按压力度
+     * @param level 随机力度
+     * @return 是否发送事件成功
+     */
     public static boolean sendScreenClickWithRandom(int x, int y, int intensity, int level) {
         x = (int) (x + Math.round(Math.random() * 2 * level - level));
         y = (int) (y + Math.round(Math.random() * 2 * level - level));
@@ -83,12 +93,17 @@ public class Simulation {
         return sendScreenClick(x, y, intensity);
     }
 
-
+    /**
+     * 发送屏幕点击事件，通过模拟驱动事件的方式，几乎等同于用户直接点击屏幕
+     * @param x 屏幕的x轴坐标
+     * @param y 屏幕的y轴坐标
+     * @param intensity 按压力度
+     * @return 是否发送事件成功
+     */
     public static boolean sendScreenClick(int x, int y, int intensity) {
         if (!isRoot) {
             isRoot = getRoot();
         }
-
         try {
             os.write("chmod 777 /dev/input/event1\n".getBytes());
             os.write("sendevent /dev/input/event1 0 4 84165\n".getBytes());
@@ -109,11 +124,19 @@ public class Simulation {
         return true;
     }
 
+    /**
+     * 获取屏幕方向
+     * @return 1:90° 2:180° 3:270° 4:360°
+     */
     public static int getScreenChange() {
         Configuration mConfiguration = BaseService.getService(HookService.class).getResources().getConfiguration(); //获取设置的配置信息
         return mConfiguration.orientation; //获取屏幕方向
     }
 
+    /**
+     * 判断屏幕是否处于打开状态
+     * @return
+     */
     public static boolean isScreenOn() {
         PowerManager pm = (PowerManager) BaseService.getService(HookService.class).getSystemService(Context.POWER_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
@@ -130,8 +153,13 @@ public class Simulation {
         return false;
     }
 
-
+    /**
+     * 录制并获取用户解锁屏幕所产生的驱动事件，获取到的事件直接重放即可解锁屏幕
+     * 该方法执行之后会在屏幕锁定之后开始录制，直到屏幕解锁停止录制，并回调返回结果
+     * @param userUnlockEventList
+     */
     public static void getUnlockEventList(final List<DeviceEvent> userUnlockEventList) {
+        //todo 这个对象要从这个类中移除，降低耦合性
         userUnlockEventList.clear();
         final EventCatcher eventCatcher = new EventCatcher();
         BaseService.getService(MainService.class).addListener(new UnlockListener.ScreenStateListener() {
@@ -145,11 +173,14 @@ public class Simulation {
                 BaseService.getService(MainService.class).removeListener(this);
                 eventCatcher.stopCatche();
                 userUnlockEventList.addAll(DeviceEvents.compactSlide(DeviceEvents.filter(eventCatcher.getEvents(), DeviceEvents.EVENT1, DeviceEvents.EVENT3), 10));
-                sendEvent(userUnlockEventList);
             }
         });
     }
 
+    /**
+     * 向系统发送驱动事件
+     * @param userUnlockEventList
+     */
     public static void sendEvent(List<DeviceEvent> userUnlockEventList) {
         try {
             long totleSleep = 0;

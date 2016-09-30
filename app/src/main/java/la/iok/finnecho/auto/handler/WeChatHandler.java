@@ -22,10 +22,25 @@ import static la.iok.finnecho.auto.host.App.TAG;
  */
 public class WeChatHandler extends EventHandler {
 
+    /**
+     * 已经检测到的数目
+     */
     protected int hasDetected = 0;
+
+    /**
+     * 已经抢到的数目
+     */
     protected int hasGrabed = 0;
+
+    /**
+     * 已经记录的数目
+     */
     protected int recorded = 0;
 
+    /**
+     * 界面变化的回调方法，检测微信界面，并发送屏幕点击事件模拟用户点击红包
+     * @param event
+     */
     public void onWindowChanged(Map event) {
         if (event != null) {
             if (event.get("packageName").equals("com.tencent.mm")) {
@@ -77,7 +92,10 @@ public class WeChatHandler extends EventHandler {
         }
     }
 
-    //检测到红包则打开界面
+    /**
+     * 通知事件回调方法，筛选出带有"[微信红包]"字样的通知，并点击进入界面
+     * @param event
+     */
     public void onNotification(Map event) {
         if (event != null) {
             try {

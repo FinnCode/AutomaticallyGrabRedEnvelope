@@ -20,7 +20,12 @@ import la.iok.finnecho.auto.host.Setting;
 
 public class CorventUtils {
 
-    public static Map<String, Object> PO2Map(Object o) {
+    /**
+     * 将对象转换为Map的方法，由于安卓没有，所以自己写了一个，不造有没有BUG
+     * @param o
+     * @return
+     */
+    public static Map<String, Object> corventToMap(Object o) {
         try {
             Map<String, Object> map = new HashMap<String, Object>();
             Field[] fields = o.getClass().getFields();
@@ -56,6 +61,11 @@ public class CorventUtils {
         return null;
     }
 
+    /**
+     * 根据Getter方法获取属性的名称
+     * @param name
+     * @return
+     */
     private static String getFieldNameForGetter(String name) {
         name = name.substring(3);
         String first = name.substring(0, 1).toLowerCase();

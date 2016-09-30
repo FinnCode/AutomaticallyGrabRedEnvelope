@@ -1,10 +1,15 @@
 package la.iok.finnecho.auto.utils;
 
+import android.nfc.Tag;
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+
+import la.iok.finnecho.auto.host.App;
 
 /**
  * JSON转换工具类
@@ -12,7 +17,6 @@ import java.util.Map;
 public final class JsonGsonUtils {
 
     private static final Gson gson = new Gson();
-//    private static final Log LOG = LogFactory.getLog(GsonUtil.class);
 
     /**
      * 如果json的内容是简单的javabean对象，使用该方法把json转换为java对象
@@ -49,11 +53,6 @@ public final class JsonGsonUtils {
         return "";
     }
 
-    public static void main(String[] args) {
-        String str = "{\"Code\":2,\"Mes\":{\"UserID\":\"960\",\"UserName\":\"\",\"Status\":\"1\",\"Sex\":\"0\",\"Serial\":\"1020153000000001\",\"School\":\"浙江省镇海中学\",\"Roles\":\"2\",\"RealName\":\"赵老师\",\"QQ\":\"\",\"Handphone\":\"17098018090\",\"Email\":\"\",\"HeaderPic\":\"http://www.ikuko.test/Scripts/images/img8.jpg\",\"LoginCount\":\"156\"}}";
-        Map map = jsonToJava(str, Map.class);
-    }
-
     /**
      * 把java对象转换为json字符串的byte数组
      *
@@ -64,7 +63,7 @@ public final class JsonGsonUtils {
         try {
             return toJsonString(value).getBytes("utf-8");
         } catch (UnsupportedEncodingException e) {
-//            LOG.error("error in toJsonBytes", e);
+            Log.e(App.TAG, "转换成Json字符串的时候出错", e);
         }
         return new byte[0];
     }
