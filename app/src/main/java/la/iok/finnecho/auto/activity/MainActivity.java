@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import la.iok.finnecho.auto.R;
 import la.iok.finnecho.auto.device.Simulation;
-import la.iok.finnecho.auto.executor.PoolExecutor;
 import la.iok.finnecho.auto.host.Host;
 import la.iok.finnecho.auto.host.Setting;
 import la.iok.finnecho.auto.service.MainService;
